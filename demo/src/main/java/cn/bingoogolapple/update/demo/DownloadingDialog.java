@@ -24,4 +24,11 @@ public class DownloadingDialog extends AppCompatDialog {
         mProgressBar.setMax((int) maxProgress);
         mProgressBar.setProgress((int) progress);
     }
+
+    @Override
+    public void show() {
+        super.show();
+        mProgressBar.setMax(100);
+        mProgressBar.setProgress(0);
+    }
 }

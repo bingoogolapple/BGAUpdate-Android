@@ -9,6 +9,14 @@
 - [x] 安装 apk 文件
 - [x] 删除之前升级时下载的老的 apk 文件
 
+## 效果图与示例 apk
+
+![BGAUpdateDemo](https://cloud.githubusercontent.com/assets/8949716/21256759/256dce3e-c3af-11e6-98b3-373afcfa4cce.gif)
+
+[点击下载 BGAUpdateDemo.apk](http://fir.im/BGAUpdateDemo) 或扫描下面的二维码安装
+
+![BGABannerDemo apk文件二维](https://cloud.githubusercontent.com/assets/8949716/21256883/db23d4b2-c3af-11e6-9793-7ac5c6624e25.png)
+
 ## 使用
 
 ### 1.添加 Gradle 依赖

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp">
+
+    <!-- https://github.com/bingoogolapple/BGAProgressBar-Android -->
+    <cn.bingoogolapple.progressbar.BGAProgressBar
+        android:id="@+id/pb_downloading_content"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="32dp"
+        android:progress="0"
+        app:bga_pb_isCapRounded="true"
+        app:bga_pb_mode="circle"
+        app:bga_pb_radius="48dp"
+        app:bga_pb_reachedColor="#FF530D"
+        app:bga_pb_reachedHeight="8dp"
+        app:bga_pb_textColor="#FF530D"
+        app:bga_pb_textSize="18sp"
+        app:bga_pb_unReachedColor="#ECF0F1"
+        app:bga_pb_unReachedHeight="4dp"/>
+
+</android.support.v7.widget.CardView>

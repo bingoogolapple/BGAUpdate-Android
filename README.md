@@ -36,6 +36,7 @@ dependencies {
 ```
 
 ### 2.配置 AndroidManifest.xml 添加 FileProvider
+
 ```xml
     <provider
         android:name="android.support.v4.content.FileProvider"
@@ -47,6 +48,8 @@ dependencies {
             android:resource="@xml/bga_upgrade"/>
     </provider>
 ```
+上方 `android:authorities="[你的应用包名].fileProvider"` 值字段没有严格要求，详情参见 [FileProvider](https://developer.android.google.cn/reference/android/support/v4/content/FileProvider.html)
+
 如果你的应用中本身就有用到 FileProvider，打开你的 FILE_PROVIDER_PATHS 规则 xml 文件，将以下代码追加进其中
 ```xml
     <external-files-path name="bgaUpgrade" path="apk" />

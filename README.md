@@ -34,7 +34,25 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
 }
 ```
-### 2.在 Activity 的 onCreate 方法中监听下载进度。demo 里引用了 rxlifecycle 这个库
+
+### 2.配置 AndroidManifest.xml 添加 FileProvider
+```xml
+    <provider
+        android:name="android.support.v4.content.FileProvider"
+        android:authorities="[你的应用包名].fileProvider"
+        android:exported="false"
+        android:grantUriPermissions="true">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/bga_upgrade"/>
+    </provider>
+```
+如果你的应用中本身就有用到 FileProvider，打开你的 FILE_PROVIDER_PATHS 规则 xml 文件，将以下代码追加进其中
+```xml
+    <external-files-path name="bgaUpgrade" path="apk" />
+```
+
+### 3.在 Activity 的 onCreate 方法中监听下载进度。demo 里引用了 rxlifecycle 这个库
 
 ```java
 // 监听下载进度
@@ -50,7 +68,7 @@ BGAUpgradeUtil.getDownloadProgressEventObservable()
             }
         });
 ```
-### 3.下载新版 apk 文件。注意先申请 WRITE_EXTERNAL_STORAGE 权限
+### 4.下载新版 apk 文件。注意先申请 WRITE_EXTERNAL_STORAGE 权限
 
 ```java
 @AfterPermissionGranted(RC_PERMISSION_DOWNLOAD)
@@ -93,7 +111,7 @@ public void downloadApkFile() {
 }
 ```
 
-### 4.下次进入应用时删除之前升级时下载的老的 apk 文件
+### 5.下次进入应用时删除之前升级时下载的老的 apk 文件
 
 ```
 BGAUpgradeUtil.deleteOldApk();

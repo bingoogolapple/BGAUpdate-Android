@@ -11,6 +11,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:support-core-utils:25.1.0'
     provided 'io.reactivex:rxjava:1.2.2'
     provided 'io.reactivex:rxandroid:1.2.1'
     provided 'com.squareup.retrofit2:retrofit:2.1.0'

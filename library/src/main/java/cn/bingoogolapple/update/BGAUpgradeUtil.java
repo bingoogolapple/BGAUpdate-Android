@@ -2,11 +2,16 @@ package cn.bingoogolapple.update;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -106,7 +111,11 @@ public class BGAUpgradeUtil {
         installApkIntent.setAction(Intent.ACTION_VIEW);
         installApkIntent.addCategory(Intent.CATEGORY_DEFAULT);
         installApkIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        installApkIntent.setDataAndType(Uri.fromFile(apkFile), MIME_TYPE_APK);
+        // 根据文件获得其uri
+        Uri apkUri = FileProvider.getUriForFile(sApp, getFileProviderAuthority(), apkFile);
+        installApkIntent.setDataAndType(apkUri, MIME_TYPE_APK);
+        // 进行安装前，对文件访问进行授权
+        grantUriPermission(installApkIntent, apkUri);
 
         if (sApp.getPackageManager().queryIntentActivities(installApkIntent, 0).size() > 0) {
             sApp.startActivity(installApkIntent);
@@ -117,6 +126,14 @@ public class BGAUpgradeUtil {
      * 删除之前升级时下载的老的 apk 文件
      */
     public static void deleteOldApk() {
+        File externalFilesDir = sApp.getExternalFilesDir(DIR_NAME_APK);
+        if (externalFilesDir == null)
+            return;
+        // 删除文件前撤销对文件的访问授权
+        for (File file : externalFilesDir.listFiles()) {
+            revokeUriPermission(FileProvider.getUriForFile(sApp, getFileProviderAuthority(), file));
+        }
+        // 删除文件
         StorageUtil.deleteFile(sApp.getExternalFilesDir(DIR_NAME_APK));
     }
 
@@ -148,6 +165,32 @@ public class BGAUpgradeUtil {
     }
 
     /**
+     * 授予对某个意向的uri授权
+     *
+     * @param intent  要授予访问某个uri的intent意向
+     * @param fileUri 要授予权限的uri
+     */
+    private static void grantUriPermission(Intent intent, Uri fileUri) {
+        List<ResolveInfo> resolvedIntentActivities = sApp.getPackageManager()
+                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+        for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
+            String packageName = resolvedIntentInfo.activityInfo.packageName;
+            sApp.grantUriPermission(packageName, fileUri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+    }
+
+    /**
+     * 撤销权限
+     *
+     * @param fileUri 撤销对某个uri的读写权限
+     */
+    private static void revokeUriPermission(Uri fileUri) {
+        sApp.revokeUriPermission(fileUri,
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
+
+    /**
      * 获取应用名称
      *
      * @return
@@ -159,5 +202,22 @@ public class BGAUpgradeUtil {
             // 利用系统api getPackageName()得到的包名，这个异常根本不可能发生
             return "";
         }
+    }
+
+    /**
+     * 获取FileProvider的auth
+     *
+     * @return
+     */
+    private static String getFileProviderAuthority() {
+        try {
+            for (ProviderInfo provider : sApp.getPackageManager().getPackageInfo(sApp.getPackageName(), PackageManager.GET_PROVIDERS).providers) {
+                if (FileProvider.class.getName().equals(provider.name)) {
+                    return provider.authority;
+                }
+            }
+        } catch (PackageManager.NameNotFoundException ignore) {
+        }
+        return null;
     }
 }

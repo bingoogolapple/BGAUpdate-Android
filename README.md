@@ -3,6 +3,7 @@
 
 ## 功能介绍
 
+- [x] 适配 Android 7.+ 系统
 - [x] 检测新版 apk 文件是否已经下载过
 - [x] RxJava + Retrofit 下载新版 apk 文件
 - [x] RxBus 监听下载进度
@@ -34,6 +35,7 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
 }
 ```
+
 ### 2.在 Activity 的 onCreate 方法中监听下载进度。demo 里引用了 rxlifecycle 这个库
 
 ```java
@@ -50,6 +52,7 @@ BGAUpgradeUtil.getDownloadProgressEventObservable()
             }
         });
 ```
+
 ### 3.下载新版 apk 文件。注意先申请 WRITE_EXTERNAL_STORAGE 权限
 
 ```java
@@ -100,6 +103,12 @@ BGAUpgradeUtil.deleteOldApk();
 ```
 
 ## 代码是最好的老师，更多详细用法请查看 [demo](https://github.com/bingoogolapple/BGAUpdate-Android/tree/master/demo):feet:
+
+## 贡献者
+
+* [bingoogolapple](https://github.com/bingoogolapple)
+* [chenfei0928](https://github.com/chenfei0928)
+* [HYVincent](https://github.com/HYVincent)
 
 ## 关于我
 

@@ -1,4 +1,4 @@
-package cn.bingoogolapple.update.demo;
+package cn.bingoogolapple.update.sample;
 
 import android.Manifest;
 import android.os.Bundle;
@@ -29,7 +29,7 @@ public class MainActivity extends RxAppCompatActivity implements EasyPermissions
     private DownloadingDialog mDownloadingDialog;
 
     private String mNewVersion = "1.0.1";
-    private String mApkUrl = "http://7xk9dj.com1.z0.glb.clouddn.com/BGAUpdateDemo_v1.0.1_debug.apk";
+    private String mApkUrl = "http://7xk9dj.com1.z0.glb.clouddn.com/BGAUpdateSample_v1.0.1_debug.apk";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

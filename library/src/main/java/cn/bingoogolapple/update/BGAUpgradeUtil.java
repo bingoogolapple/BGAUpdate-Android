@@ -1,23 +1,20 @@
 package cn.bingoogolapple.update;
 
-import android.app.Application;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ProviderInfo;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.support.v4.content.FileProvider;
-import android.util.Log;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func0;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static cn.bingoogolapple.update.AppUtil.sApp;
 
 /**
  * 作者:王浩 邮件:bingoogolapple@gmail.com
@@ -26,27 +23,7 @@ import rx.schedulers.Schedulers;
  */
 public class BGAUpgradeUtil {
     private static final String MIME_TYPE_APK = "application/vnd.android.package-archive";
-    private static final String DIR_NAME_APK = "apk";
 
-    public static final Application sApp;
-
-    static {
-        Application app = null;
-        try {
-            app = (Application) Class.forName("android.app.AppGlobals").getMethod("getInitialApplication").invoke(null);
-            if (app == null)
-                throw new IllegalStateException("Static initialization of Applications must be on main thread.");
-        } catch (final Exception e) {
-            Log.e(BGAUpgradeUtil.class.getSimpleName(), "Failed to get current application from AppGlobals." + e.getMessage());
-            try {
-                app = (Application) Class.forName("android.app.ActivityThread").getMethod("currentApplication").invoke(null);
-            } catch (final Exception ex) {
-                Log.e(BGAUpgradeUtil.class.getSimpleName(), "Failed to get current application from ActivityThread." + e.getMessage());
-            }
-        } finally {
-            sApp = app;
-        }
-    }
 
     private BGAUpgradeUtil() {
     }
@@ -67,7 +44,7 @@ public class BGAUpgradeUtil {
      * @return
      */
     public static boolean isApkFileDownloaded(String version) {
-        File apkFile = getApkFile(version);
+        File apkFile = StorageUtil.getApkFile(version);
         if (apkFile.exists()) {
             installApk(apkFile);
             return true;
@@ -95,7 +72,7 @@ public class BGAUpgradeUtil {
         }).map(new Func1<InputStream, File>() {
             @Override
             public File call(InputStream inputStream) {
-                return saveApk(inputStream, version);
+                return StorageUtil.saveApk(inputStream, version);
             }
         }).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
@@ -111,11 +88,13 @@ public class BGAUpgradeUtil {
         installApkIntent.setAction(Intent.ACTION_VIEW);
         installApkIntent.addCategory(Intent.CATEGORY_DEFAULT);
         installApkIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        // 根据文件获得其uri
-        Uri apkUri = FileProvider.getUriForFile(sApp, getFileProviderAuthority(), apkFile);
-        installApkIntent.setDataAndType(apkUri, MIME_TYPE_APK);
-        // 进行安装前，对文件访问进行授权
-        grantUriPermission(installApkIntent, apkUri);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
+            installApkIntent.setDataAndType(FileProvider.getUriForFile(sApp, PermissionUtil.getFileProviderAuthority(), apkFile), MIME_TYPE_APK);
+            installApkIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } else {
+            installApkIntent.setDataAndType(Uri.fromFile(apkFile), MIME_TYPE_APK);
+        }
 
         if (sApp.getPackageManager().queryIntentActivities(installApkIntent, 0).size() > 0) {
             sApp.startActivity(installApkIntent);
@@ -126,98 +105,12 @@ public class BGAUpgradeUtil {
      * 删除之前升级时下载的老的 apk 文件
      */
     public static void deleteOldApk() {
-        File externalFilesDir = sApp.getExternalFilesDir(DIR_NAME_APK);
-        if (externalFilesDir == null)
+        File apkDir = StorageUtil.getApkFileDir();
+        if (apkDir == null || apkDir.listFiles() == null || apkDir.listFiles().length == 0) {
             return;
-        // 删除文件前撤销对文件的访问授权
-        for (File file : externalFilesDir.listFiles()) {
-            revokeUriPermission(FileProvider.getUriForFile(sApp, getFileProviderAuthority(), file));
         }
+
         // 删除文件
-        StorageUtil.deleteFile(sApp.getExternalFilesDir(DIR_NAME_APK));
-    }
-
-    /**
-     * 获取 apk 文件
-     *
-     * @param version 新 apk 文件版本号
-     * @return
-     */
-    private static File getApkFile(String version) {
-        return new File(sApp.getExternalFilesDir(DIR_NAME_APK), getAppName() + "_v" + version + ".apk");
-    }
-
-    /**
-     * 保存 apk 文件
-     *
-     * @param is
-     * @param version
-     * @return
-     */
-    private static File saveApk(InputStream is, String version) {
-        File file = getApkFile(version);
-
-        if (StorageUtil.writeFile(file, is)) {
-            return file;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 授予对某个意向的uri授权
-     *
-     * @param intent  要授予访问某个uri的intent意向
-     * @param fileUri 要授予权限的uri
-     */
-    private static void grantUriPermission(Intent intent, Uri fileUri) {
-        List<ResolveInfo> resolvedIntentActivities = sApp.getPackageManager()
-                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
-            String packageName = resolvedIntentInfo.activityInfo.packageName;
-            sApp.grantUriPermission(packageName, fileUri,
-                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        }
-    }
-
-    /**
-     * 撤销权限
-     *
-     * @param fileUri 撤销对某个uri的读写权限
-     */
-    private static void revokeUriPermission(Uri fileUri) {
-        sApp.revokeUriPermission(fileUri,
-                Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-    }
-
-    /**
-     * 获取应用名称
-     *
-     * @return
-     */
-    private static String getAppName() {
-        try {
-            return sApp.getPackageManager().getPackageInfo(sApp.getPackageName(), 0).applicationInfo.loadLabel(sApp.getPackageManager()).toString();
-        } catch (Exception e) {
-            // 利用系统api getPackageName()得到的包名，这个异常根本不可能发生
-            return "";
-        }
-    }
-
-    /**
-     * 获取FileProvider的auth
-     *
-     * @return
-     */
-    private static String getFileProviderAuthority() {
-        try {
-            for (ProviderInfo provider : sApp.getPackageManager().getPackageInfo(sApp.getPackageName(), PackageManager.GET_PROVIDERS).providers) {
-                if (FileProvider.class.getName().equals(provider.name)) {
-                    return provider.authority;
-                }
-            }
-        } catch (PackageManager.NameNotFoundException ignore) {
-        }
-        return null;
+        StorageUtil.deleteFile(apkDir);
     }
 }

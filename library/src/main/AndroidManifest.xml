@@ -1,1 +1,15 @@
-<manifest package="cn.bingoogolapple.update"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="cn.bingoogolapple.update">
+
+    <application>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.bga_update.file_provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/bga_upgrade_file_paths"/>
+        </provider>
+    </application>
+</manifest>

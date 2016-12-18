@@ -7,11 +7,12 @@ android {
     defaultConfig {
         minSdkVersion ANDROID_BUILD_MIN_SDK_VERSION as int
         targetSdkVersion ANDROID_BUILD_TARGET_SDK_VERSION as int
+        consumerProguardFiles 'consumer-proguard-rules.pro'
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-core-utils:25.1.0'
+    provided 'com.android.support:support-core-utils:25.1.0'
     provided 'io.reactivex:rxjava:1.2.2'
     provided 'io.reactivex:rxandroid:1.2.1'
     provided 'com.squareup.retrofit2:retrofit:2.1.0'

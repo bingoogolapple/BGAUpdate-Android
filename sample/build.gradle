@@ -38,8 +38,8 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-//    compile 'cn.bingoogolapple:bga-update:1.0.1@aar'
+    compile 'cn.bingoogolapple:bga-update:1.0.1@aar'
     // 上面几个库必须依赖
 
-    compile project(':library')
+//    compile project(':library')
 }

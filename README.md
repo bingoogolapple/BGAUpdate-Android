@@ -3,7 +3,7 @@
 
 ## 功能介绍
 
-- [x] 支持 7.+ 系统
+- [x] 适配 Android 7.+ 系统
 - [x] 检测新版 apk 文件是否已经下载过
 - [x] RxJava + Retrofit 下载新版 apk 文件
 - [x] RxBus 监听下载进度

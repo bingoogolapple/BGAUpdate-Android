@@ -3,7 +3,10 @@ package cn.bingoogolapple.update;
 import android.app.Application;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.InputStream;
@@ -102,7 +105,7 @@ public class BGAUpgradeUtil {
      * @param apkFile
      */
     public static void installApk(File apkFile) {
-        Intent installApkIntent = new Intent();
+       /* Intent installApkIntent = new Intent();
         installApkIntent.setAction(Intent.ACTION_VIEW);
         installApkIntent.addCategory(Intent.CATEGORY_DEFAULT);
         installApkIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -110,6 +113,19 @@ public class BGAUpgradeUtil {
 
         if (sApp.getPackageManager().queryIntentActivities(installApkIntent, 0).size() > 0) {
             sApp.startActivity(installApkIntent);
+        }*/
+       Toast.makeText(sApp,apkFile.getPath(),Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(sApp, "cn.bingoogolapple.update.fileprovider", apkFile);
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+        } else {
+            intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+        if (sApp.getPackageManager().queryIntentActivities(intent, 0).size() > 0) {
+            sApp.startActivity(intent);
         }
     }
 

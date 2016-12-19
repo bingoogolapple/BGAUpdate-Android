@@ -36,18 +36,16 @@ dependencies {
 }
 ```
 
-### 2.在 Activity 的 onCreate 方法中监听下载进度。demo 里引用了 rxlifecycle 这个库
+### 2.在 Activity 的 onCreate 方法中监听下载进度。demo 里引用了 rxlifecycle 这个库来防止 Activity 内存泄漏
 
 ```java
-// 监听下载进度
 BGAUpgradeUtil.getDownloadProgressEventObservable()
         .compose(this.<BGADownloadProgressEvent>bindToLifecycle())
         .subscribe(new Action1<BGADownloadProgressEvent>() {
             @Override
-            public void call(BGADownloadProgressEvent BGADownloadProgressEvent) {
-                if (mDownloadingDialog != null && mDownloadingDialog.isShowing() && BGADownloadProgressEvent.isNotDownloadFinished()) {
-                    mDownloadingDialog.setProgress((int) BGADownloadProgressEvent.getProgress());
-                    mDownloadingDialog.setMaxProgress((int) BGADownloadProgressEvent.getTotal());
+            public void call(BGADownloadProgressEvent downloadProgressEvent) {
+                if (mDownloadingDialog != null && mDownloadingDialog.isShowing() && downloadProgressEvent.isNotDownloadFinished()) {
+                    mDownloadingDialog.setProgress(downloadProgressEvent.getProgress(), downloadProgressEvent.getTotal());
                 }
             }
         });

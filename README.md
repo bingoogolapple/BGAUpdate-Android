@@ -3,12 +3,17 @@
 
 ## 功能介绍
 
-- [x] 适配 Android 7.+ 系统
+- [x] 适配 Android 8.+ 系统
 - [x] 检测新版 apk 文件是否已经下载过
-- [x] RxJava + Retrofit 下载新版 apk 文件
+- [x] RxJava1.x + Retrofit2.x 下载新版 apk 文件
 - [x] RxBus 监听下载进度
 - [x] 安装 apk 文件
 - [x] 删除之前升级时下载的老的 apk 文件
+
+## TODO
+
+- [x] 支持 RxJava2.x
+- [x] MD5 校验
 
 ## 效果图与示例 apk
 
@@ -21,18 +26,17 @@
 ## 使用
 
 ### 1.添加 Gradle 依赖
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cn.bingoogolapple/bga-update/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cn.bingoogolapple/bga-update) bga-update 后面的「latestVersion」指的是左边这个 maven-central 徽章后面的「数字」，请自行替换。
-
+[![Download](https://api.bintray.com/packages/bingoogolapple/maven/bga-update/images/download.svg)](https://bintray.com/bingoogolapple/maven/bga-update/_latestVersion) bga-update 后面的「latestVersion」指的是左边这个 Download 徽章后面的「数字」，请自行替换。
 ```groovy
 dependencies {
     compile 'cn.bingoogolapple:bga-update:latestVersion@aar'
 
     // 换成己工程里依赖的 rxjava 和 retrofit 版本
-    compile 'io.reactivex:rxjava:1.2.2'
+    compile 'io.reactivex:rxjava:1.3.2'
     compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.3.0'
 }
 ```
 

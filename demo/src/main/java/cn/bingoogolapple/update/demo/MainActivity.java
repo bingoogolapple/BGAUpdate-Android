@@ -28,8 +28,8 @@ public class MainActivity extends RxAppCompatActivity implements EasyPermissions
 
     private DownloadingDialog mDownloadingDialog;
 
-    private String mNewVersion = "1.0.1";
-    private String mApkUrl = "http://7xk9dj.com1.z0.glb.clouddn.com/BGAUpdateDemo_v1.0.1_debug.apk";
+    private String mNewVersion = "1.0.3";
+    private String mApkUrl = "http://7xk9dj.com1.z0.glb.clouddn.com/BGAUpdateDemo_v1.0.3_debug.apk";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

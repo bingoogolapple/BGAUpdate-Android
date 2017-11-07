@@ -1,6 +1,8 @@
 package cn.bingoogolapple.update;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.content.FileProvider;
@@ -90,7 +92,7 @@ public class BGAUpgradeUtil {
         installApkIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
-            installApkIntent.setDataAndType(FileProvider.getUriForFile(sApp, PermissionUtil.getFileProviderAuthority(), apkFile), MIME_TYPE_APK);
+            installApkIntent.setDataAndType(FileProvider.getUriForFile(sApp, getFileProviderAuthority(), apkFile), MIME_TYPE_APK);
             installApkIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         } else {
             installApkIntent.setDataAndType(Uri.fromFile(apkFile), MIME_TYPE_APK);
@@ -99,6 +101,23 @@ public class BGAUpgradeUtil {
         if (sApp.getPackageManager().queryIntentActivities(installApkIntent, 0).size() > 0) {
             sApp.startActivity(installApkIntent);
         }
+    }
+
+    /**
+     * 获取FileProvider的auth
+     *
+     * @return
+     */
+    private static String getFileProviderAuthority() {
+        try {
+            for (ProviderInfo provider : sApp.getPackageManager().getPackageInfo(sApp.getPackageName(), PackageManager.GET_PROVIDERS).providers) {
+                if (FileProvider.class.getName().equals(provider.name) && provider.authority.endsWith(".bga_update.file_provider")) {
+                    return provider.authority;
+                }
+            }
+        } catch (PackageManager.NameNotFoundException ignore) {
+        }
+        return null;
     }
 
     /**
